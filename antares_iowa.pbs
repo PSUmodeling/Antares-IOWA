@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=48:00:00
+#PBS -l pmem=2gb
+#PBS -A open
+#PBS -j oe
+#PBS -m abe
+#PBS -M yshi@psu.edu
+
+cd $PBS_O_WORKDIR
+echo "Job started on `hostname` at `date`"
+jobstart=`date +%s`
+
+# Generate operation files and multi-mode files
+echo "\nGenerating additional input files..."
+module load python/3.6.3-anaconda5.0.1
+python ./IA_genScen_ald.py
+
+# Run base simulations with spin-up
+echo "\nRunning Cycles simulations..."
+
+# Show Cycles version
+./Cycles -V
+
+./multi.sh IA_CT_NCC_NF_00RH_CCS_scenarios.txt 1
+./multi.sh IA_CT_NCC_NF_00RH_CS_scenarios.txt 1
+./multi.sh IA_CT_NCC_NF_00RH_C_scenarios.txt 1
+
+# Parse output
+python ./scenOutput.py
+
+jobend=`date +%s`
+echo -e "\nJob ended at `date`"
+dt=$((jobend - jobstart))
+ds=$((dt % 60))
+dm=$(((dt / 60) % 60))
+dh=$((dt / 3600))
+printf "Elapsed time %d:%02d:%02d" $dh $dm $ds
