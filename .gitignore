@@ -1,0 +1,11 @@
+# input/output files
+input/
+output/
+IA_EFC_PSU_CGSB_20200622.csv
+IA_edited_histosols.txt
+
+# Cycles executable
+
+# output archives
+*.zip
+
