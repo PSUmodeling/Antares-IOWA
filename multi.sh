@@ -66,6 +66,8 @@ EOF
         if [ $SPIN_UP == 1 ]; then
             ./Cycles -s -b ${SIM_CODE}
         else
+            # Unzip soil file from archive
+            unzip -j ss_soil.zip input/${SOIL_FILE} -d ./input
             ./Cycles -b ${SIM_CODE}
         fi
 
@@ -76,8 +78,13 @@ EOF
         ZIP=${MULTI_FILE#"input/"}
         ZIP=${ZIP%%.*}
 
-        # Add output to archive
+        # Add output to archive and then delete
         zip -ur ${ZIP}.zip output/${SIM_CODE} &> /dev/null
+        rm -r output/${SIM_CODE} &> /dev/null
+
+        # Add steady-state soil file to archive and then delete
+        zip -u ss_soil.zip input/${SIM_CODE}_ss.soil
+        rm input/${SIM_CODE}_ss.soil
 
     done
 }<"$MULTI_FILE"
