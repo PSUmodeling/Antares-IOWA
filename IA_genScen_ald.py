@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 
 import numpy
-
+import sys
 #########################################################################################
 ## write multimode files
 #########################################################################################
 
-scen_interest = ['CT_NCC_NF_00RH'#,'NT_RYE_NPS_30RH'
-                 #,'CT_NCC_NF_30RH','CT_NCC_NF_45RH','CT_NCC_NF_70RH'
+
+data = open("PSU_CT_00RH_NCC_NF_ref.csv") #SF_ALD_metadata_PSU.csv
+ #IA_EFC_PSU_CGSB_20200622.csv
+
+if len(sys.argv)!=2:
+    raise ValueError('Provide scenario identifier')
+scen_interest = (sys.argv[1].strip("[]")).split(',')
+
+#scen_interest = ['CT_NCC_NF_00RH'#,'NT_RYE_NPS_30RH'
+                 #,'CT_NCC_NF_30RH'#,'CT_NCC_NF_45RH','CT_NCC_NF_70RH'
                  #,'RT_NCC_NF_00RH','RT_NCC_NF_30RH','RT_NCC_NF_45RH','RT_NCC_NF_70RH'
-                 #,'NT_NCC_NF_00RH','NT_NCC_NF_30RH','NT_NCC_NF_45RH','NT_NCC_NF_70RH'
+                 #,'NT_NCC_NF_00RH'#,'NT_NCC_NF_30RH','NT_NCC_NF_45RH','NT_NCC_NF_70RH'
                  #,'CT_NCC_NPS_00RH','CT_NCC_NPS_30RH','CT_NCC_NPS_45RH','CT_NCC_NPS_70RH'
                  #,'RT_NCC_NPS_00RH','RT_NCC_NPS_30RH','RT_NCC_NPS_45RH','RT_NCC_NPS_70RH'
                  #,'NT_NCC_NPS_00RH','NT_NCC_NPS_30RH','NT_NCC_NPS_45RH','NT_NCC_NPS_70RH'
@@ -19,15 +27,15 @@ scen_interest = ['CT_NCC_NF_00RH'#,'NT_RYE_NPS_30RH'
                  #,'CT_RYE_NPS_00RH','CT_RYE_NPS_30RH','CT_RYE_NPS_45RH','CT_RYE_NPS_70RH'
                  #,'RT_RYE_NPS_00RH','RT_RYE_NPS_30RH','RT_RYE_NPS_45RH','RT_RYE_NPS_70RH'
                  #,'NT_RYE_NPS_00RH','NT_RYE_NPS_30RH','NT_RYE_NPS_45RH','NT_RYE_NPS_70RH'
-                 ]
+                 #]
 
 # create multimode files
-r_type = ['C','CS','CCS']#,'S']#,'CCSS','CSSS','CCCS','SG']
-lenRot = [1,2,3]#,1] #4,4,4,1] # length of rotation label
-#tillage= ['RT','NT','CT'] # reduced till, no till, conventional
-#application=['NF','NPS'] # fall UAN, preplant anhydrous w/ UAN side-dress
-#covercrop = ['NCC','RYE'] # no cover crop, rye cover crop
-#resRemoval = ['00RH','30RH','45RH','75RH'] # fraction of residue removed
+r_type = ['C','CS','CCS']                   # rotations
+lenRot = [1,2,3]                            # length of rotation label
+#tillage= ['RT','NT','CT']                  # reduced till, no till, conventional
+#application=['NF','NPS']                   # fall UAN, preplant anhydrous w/ UAN side-dress
+#covercrop = ['NCC','RYE']                  # no cover crop, rye cover crop
+#resRemoval = ['00RH','30RH','45RH','75RH'] # percent of residue removed
 
 # CRP scenarios
 
@@ -44,21 +52,15 @@ for j in range(len(scen_interest)):
         MMfile.write('SIM_CODE \t\t\t\t ROTATION_YEARS START_YEAR END_YEAR USE_REINIT CROP_FILE \t OPERATION_FILE \t\t\t SOIL_FILE \
             \t WEATHER_FILE \t REINIT_FILE HOURLY_INFILTRATION AUTOMATIC_NITROGEN \n')
         MMfile.close()
-#try:
-data = open("IA_EFC_PSU_CGSB_20200622.csv")
-# except IOError as e:
-    # print e
-    # print('Input file is locked')
 
-    #IA_20200210.csv)
 # default parameter values
 reinit   = 0
 hour_inf = 1
 auto_nit = 0
-start    = 2013
+start    = 2010
 end      = 2016
 reinit_file = 'N/A'
-crop_file   = 'GenCrops0RH.crop'
+crop_file   = 'GenCrops00RH.crop'
 
 firstrun = True
 C = []
@@ -183,7 +185,7 @@ for i in range(nrow):
     oper_fileSG = 'operations/ALD_SG1_NH'+str(A[i])+'_CT_00RH.operation'
     MMfileSG = open( 'input/IA_SG_scenarios.txt', 'a' )
     MMfileSG.write('%s \t %i \t\t\t %i \t\t %i \t %i \t %s \t %s \t %s \t %s \t %s \t %i \t %i \n' %
-    (C[i]+'SG', 1, 2013, 2016, reinit, crop_file, oper_fileSG, ctrl_SG[0:-2]+'CT_NCC_NF_00RH_ss.soil', wthr_file, reinit_file, hour_inf, auto_nit))
+    (C[i]+'SG', 1, 2010, 2016, reinit, crop_file, oper_fileSG, ctrl_SG[0:-2]+'CT_NCC_NF_00RH_ss.soil', wthr_file, reinit_file, hour_inf, auto_nit))
     MMfileSG.close()
 
     for k in range(len(scen_interest)):
@@ -206,7 +208,7 @@ for i in range(nrow):
 
             # scenarios should have a soil from default business-as-usual scenario, fertilizer scenarios will still have areas w/ manure
             if 'CT_NCC_NF_00RH' not in ctrl_file:
-                start= 2013
+                # start= 2010
                 MMfile.write('%s \t %i \t\t\t %i \t\t %i \t %i \t %s \t %s \t %s \t %s \t %s \t %i \t %i \n' %
                 (ctrl_file, rlen, start, end, reinit, 'GenCrops'+scen_interest[k][-4:]+'.crop', oper_file, soil_file_alt, wthr_file, reinit_file, hour_inf, auto_nit))
                 MMfile.close()
@@ -311,6 +313,9 @@ def editFile(rotfile,newfile,amends,perm):
                     if 'Rye' in ofile[op]:
                         ofile[op] = ''
 
+                    if 'FORAGE_HARVEST' in ofile[op]:
+                        ofile[op] = ''
+
                 # if nutrient amendment isn't standard composition (swine or fertilizer is default)
                 if A[i]==amends and (amends != 0.056 and amends != 0.75):
 
@@ -379,7 +384,8 @@ def editFile(rotfile,newfile,amends,perm):
 
             ofile = '\n\n'.join(ofile)
 
-            if perm != 1:
+            if perm!=1:
+                #print(nf)
                 nfile = ofile.split('\n###\n')
                 sfile = numpy.sort(nfile)
                 ofile = '\n###\n'.join(sfile)
