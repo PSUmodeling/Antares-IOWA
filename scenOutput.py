@@ -1,4 +1,4 @@
-#### Potential Antares / EFC CSV files (ald_fname)
+# ### Potential Antares / EFC CSV files (ald_fname)
 #                'CT_NCC_NF_00RH'#,'NT_RYE_NPS_30RH'
                  #,'CT_NCC_NF_30RH','CT_NCC_NF_45RH','CT_NCC_NF_70RH'
                  #,'RT_NCC_NF_00RH','RT_NCC_NF_30RH','RT_NCC_NF_45RH','RT_NCC_NF_70RH'
@@ -14,7 +14,6 @@
                  #,'NT_RYE_NPS_00RH','NT_RYE_NPS_30RH','NT_RYE_NPS_45RH','NT_RYE_NPS_70RH'
 #!/usr/bin/env python3
 import sys
-#ald_fname = 'PSU_CT_00RH_NCC_NF.csv' # This will create a reference scenario
 
 if len(sys.argv)!=2:
     raise ValueError('Provide scenario identifier')
@@ -22,11 +21,9 @@ scen_interest = sys.argv[1]#.strip("[]")).split(',')
 
 ref_file = 'PSU_CT_00RH_NCC_NF_test.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
 data = open(ref_file)
-wfile_name = scen_interest+'_cycles.csv'
-
 scen_interest = scen_interest.split('_')
-scen = scen_interest[1]+'_'+scen_interest[3]+'_'+scen_interest[4]+'_'+scen_interest[2]
-
+scen = scen_interest[0]+'_'+scen_interest[3]+'_'+scen_interest[1]+'_'+scen_interest[2]
+wfile_name = scen+'_cycles.csv'
 scen_interest = '_'.join(scen_interest)
 
 # create multimode files
@@ -157,8 +154,10 @@ for i in range(nrow):
             P.append('1')
         else: P.append('2')
 
-    ctrl_file = 'W'+WC[i]+'_'+crop[i]+P[i]+'_'+S[i]+'_'+scen
-    #print(ctrl_file)
+    ctrl_file = 'W'+WC[i]+'_'+crop[i]+P[i]+'_'+S[i]+'_'+scen_interest
+    print(ctrl_file)
+    print(scen)
+
     n_path = 'output/'+ctrl_file+'/annualN.dat'
     y_path = 'output/'+ctrl_file+'/season.dat'
     s_path = 'output/'+ctrl_file+'/summary.dat'
@@ -211,13 +210,6 @@ for i in range(nrow):
                     Yld.append(yldOld)
                     Crp.append(crpOld)
 
-                #elif yldOld !='':
-                    #pass
-
-                #else:
-                    #Yld.append(yld)
-                    #Crp.append(crp)
-
                 yrOld = row[0][0:4]
                 crpOld= crp
                 yldOld= yld
@@ -241,8 +233,6 @@ for i in range(nrow):
                 # for alternative scenarios, 2013-2016
                 dC = round(float(row[2]),3)
         delta_C.append(dC)
-                # print(s_path)
-                # print(row)
         cycOut.close()
 
     except FileNotFoundError:
