@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-
-#scen_interest = ['C_CT_RYE_NF','C_RT_RYE_NPS']
-# data = open("CT_NCC_NF_30RH.csv")
-
 #### Potential Antares / EFC CSV files (ald_fname)
 #                'CT_NCC_NF_00RH'#,'NT_RYE_NPS_30RH'
                  #,'CT_NCC_NF_30RH','CT_NCC_NF_45RH','CT_NCC_NF_70RH'
@@ -17,19 +12,26 @@
                  #,'CT_RYE_NPS_00RH','CT_RYE_NPS_30RH','CT_RYE_NPS_45RH','CT_RYE_NPS_70RH'
                  #,'RT_RYE_NPS_00RH','RT_RYE_NPS_30RH','RT_RYE_NPS_45RH','RT_RYE_NPS_70RH'
                  #,'NT_RYE_NPS_00RH','NT_RYE_NPS_30RH','NT_RYE_NPS_45RH','NT_RYE_NPS_70RH'
-
+#!/usr/bin/env python3
+import sys
 #ald_fname = 'PSU_CT_00RH_NCC_NF.csv' # This will create a reference scenario
-ald_fname = 'PSU_CT_00RH_NCC_NF.csv'
-data = open(ald_fname)
-wfile_name = ald_fname[0:-4]+'_cycles.csv'
 
-ald_fname = ald_fname.split('_')
-scen = ald_fname[1]+'_'+ald_fname[3]+'_'+ald_fname[4]+'_'+ald_fname[2]
-ald_fname = '_'.join(ald_fname)
+if len(sys.argv)!=2:
+    raise ValueError('Provide scenario identifier')
+scen_interest = sys.argv[1]#.strip("[]")).split(',')
+
+ref_file = 'PSU_CT_00RH_NCC_NF_test.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
+data = open(ref_file)
+wfile_name = scen_interest+'_cycles.csv'
+
+scen_interest = scen_interest.split('_')
+scen = scen_interest[1]+'_'+scen_interest[3]+'_'+scen_interest[4]+'_'+scen_interest[2]
+
+scen_interest = '_'.join(scen_interest)
 
 # create multimode files
-r_type =['C','CS','CCS','S',]
-lenRot  =[1,1,2,1]
+r_type =['C','CS','CCS']
+lenRot  =[1,2,3]
 
 firstrun = True
 C = []
@@ -40,8 +42,8 @@ P = []
 A = []
 W = []
 WC= []
-ON= []
-TP= []
+# ON= []
+# TP= []
 B = []
 crop=[]
 nOut = []
@@ -60,8 +62,8 @@ sc = -1  # soil id
 lc = -1  # landuse id
 anc= -1  # animal id
 ac = -1  # ammonium id
-onc= -1  # organic nitrogen id
-tpc= -1  # total phosphorus id
+# onc= -1  # organic nitrogen id
+# tpc= -1  # total phosphorus id
 wc = -1  # nldas weather file
 wcc= -1  # nldas code id
 rlen = -1  # rotation length
@@ -91,7 +93,7 @@ for row in data:
                     ac = i
                 elif row[i] == '_ONADJ':
                     onc = i
-                elif row[i] == '_ANIMAAL':
+                elif row[i] == '_ANIMAL':
                     anc = i
                 elif row[i] == '_PADJ':
                     tpc = i
@@ -104,8 +106,8 @@ for row in data:
             A.append(float(row[ac]))
             M.append(float(row[mc]))
             B.append(row[anc])
-            ON.append(float(row[onc]))
-            TP.append(float(row[tpc]))
+            # ON.append(float(row[onc]))
+            # TP.append(float(row[tpc]))
             W.append(row[wc].strip())
             WC.append(row[wcc].strip())
         except ValueError:
@@ -156,23 +158,31 @@ for i in range(nrow):
         else: P.append('2')
 
     ctrl_file = 'W'+WC[i]+'_'+crop[i]+P[i]+'_'+S[i]+'_'+scen
+    #print(ctrl_file)
     n_path = 'output/'+ctrl_file+'/annualN.dat'
     y_path = 'output/'+ctrl_file+'/season.dat'
     s_path = 'output/'+ctrl_file+'/summary.dat'
+
     try:
-        #print(n_path)
         cycOut = open(n_path)
         nums = []
+        nitrate = vol = nitrous = 'NA'
         for rownum, row in enumerate(cycOut):
             if rownum > 1 and float(row[0:4])>= 2013:
-                #print(C[i])
                 nums_str = row.split()
                 nums = [float(n.strip()) for n in nums_str]
-                NO3.append(round(nums[4]+nums[6],3))
-                N2O.append(round(nums[11],3))
-                Vol.append(round(nums[10],3))
+
+                nitrate = round(nums[4]+nums[6],3)
+                nitrous = round(nums[11],3)
+                vol = round(nums[10],3)
+                NO3.append(nitrate)
+                N2O.append(nitrous)
+                Vol.append(vol)
         cycOut.close()
-        nOut.append(','+str(NO3)[1:-1]+','+str(N2O)[1:-1]+','+str(Vol)[1:-1])
+        if nitrate == 'NA':
+            nOut.append(',NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA')
+        else:
+            nOut.append(','+str(NO3)[1:-1]+','+str(N2O)[1:-1]+','+str(Vol)[1:-1])
 
         cycOut = open(y_path)
         crpOld = ''
@@ -215,17 +225,24 @@ for i in range(nrow):
         # Take care of the last row of data
         Yld.append(yld)
         Crp.append(crp)
-
         cycOut.close()
-        yOut.append(','+str(Crp)[1:-1]+','+str(Yld)[1:-1]+',')
+
+        if crpOld== '': # There's no crop data
+            yOut.append(',NA,NA,NA,NA,NA,NA,NA,NA,')
+        else:
+            yOut.append(','+str(Crp)[1:-1]+','+str(Yld)[1:-1]+',')
         cycOut = open(s_path)
+        dC = 'NA'
         for rownum,row in enumerate(cycOut):
             if rownum == 2:
                 row = row.split()
                 # change in soil C over the simulation
                 # for default scenario, 1980-2016
                 # for alternative scenarios, 2013-2016
-                delta_C.append(round(float(row[2]),3))
+                dC = round(float(row[2]),3)
+        delta_C.append(dC)
+                # print(s_path)
+                # print(row)
         cycOut.close()
 
     except FileNotFoundError:
@@ -234,11 +251,13 @@ for i in range(nrow):
         delta_C.append('NA')
 data.close()
 
+# print(nrow)
+# print(len(delta_C))
 frstrun=True
 newdata=''
 updated = ''
 add0n=' '
-wfile = open(ald_fname)
+wfile = open(ref_file)
 for j,row in enumerate(wfile):
     row = [r.strip() for r in row.split(',')]
     i = j-1
