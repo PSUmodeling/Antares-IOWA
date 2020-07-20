@@ -155,9 +155,6 @@ for i in range(nrow):
         else: P.append('2')
 
     ctrl_file = 'W'+WC[i]+'_'+crop[i]+P[i]+'_'+S[i]+'_'+scen_interest
-    print(ctrl_file)
-    print(scen)
-
     n_path = 'output/'+ctrl_file+'/annualN.dat'
     y_path = 'output/'+ctrl_file+'/season.dat'
     s_path = 'output/'+ctrl_file+'/summary.dat'
@@ -241,6 +238,13 @@ for i in range(nrow):
         delta_C.append('NA')
 data.close()
 
+if nrow != len(delta_C) or nrow != len(nOut) or nrow != len(yOut):
+    print('Length of output arrays are not equal')
+    print('Number of rows is '+str(nrow))
+    print('Length of delta_C: '+str(len(delta_C)))
+    print('Length of N array: '+str(len(nOut)))
+    print('Length of Y array '+str(len(yOut)))
+    quit()
 # print(nrow)
 # print(len(delta_C))
 frstrun=True
