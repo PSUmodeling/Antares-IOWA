@@ -8,7 +8,7 @@
 6. Download the 4 'GenCrops' crop files from the 'Iowa' folder on box. These should be placed in the Cycles input folder. [GenCrops70RH, GenCrops45RH, GenCrops30RH, GenCrops00RH]
 7. Grab the input file for the scripts [`PSU_CT_00RH_NCC_NF_ref.csv`](https://psu.app.box.com/folder/117603443837)
    - Put in Cycles folder just above input folder (along with scripts)
-8. `IA_genScen_ALD.py` creates operation files and multimode files. It is currently set up to read in `CLU_CT_00RH_NCC_NF_hnrr.csv`. The input file can be changed on line 44: ` data = open("PSU_CT_00RH_NCC_NF_ref.csv")`.
+8. `IA_genScen_ALD.py` creates operation files and multimode files. The input file can be changed on line 44: ` data = open("PSU_CT_00RH_NCC_NF_ref.csv")`.
     - It is set up to run the default scenario and one other scenario for testing. If you want to create files for certain scenarios or all of the scenarios, lines 6-17 (as shown below) can be uncommented. The scenarios should match up with file names listed in the folder [https://antaresgroup.egnyte.com/app/index.do#storage/files/1/Shared/Client%20Shares/Tableau_BLD/CGSB_data/CGSB_clu](https://antaresgroup.egnyte.com/app/index.do#storage/files/1/Shared/Client%20Shares/Tableau_BLD/CGSB_data/CGSB_clu)
 
    Command line examples:  `python3 ./IA_genScen_ald.py CT_NCC_NF_00RH` or `python3 ./IA_genScen_ald.py [CT_NCC_NF_00RH,RT_RYE_NPS_30RH]`
