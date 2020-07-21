@@ -3,7 +3,7 @@
 1. Download [Cycles](https://github.com/PSUmodeling/Cycles/releases/)
 2. Compile Cycles
 3. Download [default operation files](https://psu.app.box.com/folder/117602483623). These operation files should be placed at `input/operations`
-4. [NLDAS data](https://psu.app.box.com/folder/115212797598) should be placed at `input/weather`
+4. [NLDAS data](https://psu.box.com/s/e368o112isdj1pszwtoc8c87so9g5ck2) should be placed at `input/weather`
 5. SSURGO soils (checked to be at or below saturation) should be placed at `input/soils`. These files are labeled by gnatsgo mukey
 6. Download the 4 'GenCrops' crop files from the 'Iowa' folder on box. These should be placed in the Cycles input folder. [GenCrops70RH, GenCrops45RH, GenCrops30RH, GenCrops00RH]
 7. Grab the input file for the scripts [`PSU_CT_00RH_NCC_NF_ref.csv`](https://psu.app.box.com/folder/117603443837)
