@@ -19,7 +19,7 @@ if len(sys.argv)!=2:
     raise ValueError('Provide scenario identifier')
 scen_interest = sys.argv[1]#.strip("[]")).split(',')
 
-ref_file = 'PSU_CT_00RH_NCC_NF_ref.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
+ref_file = 'PSU_CT_00RH_NCC_NF_SF.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
 data = open(ref_file)
 scen_interest = scen_interest.split('_')
 scen = scen_interest[0]+'_'+scen_interest[3]+'_'+scen_interest[1]+'_'+scen_interest[2]
@@ -155,12 +155,18 @@ for i in range(nrow):
         else: P.append('2')
 
     ctrl_file = 'W'+WC[i]+'_'+crop[i]+P[i]+'_'+S[i]+'_'+scen_interest
+
     n_path = 'output/'+ctrl_file+'/annualN.dat'
     y_path = 'output/'+ctrl_file+'/season.dat'
     s_path = 'output/'+ctrl_file+'/summary.dat'
 
     try:
         cycOut = open(n_path)
+        if 'IND' in cycOut:
+            print('#IND error printed')
+            print(ctrl_file)
+            quit()
+            
         nums = []
         nitrate = vol = nitrous = 'NA'
         for rownum, row in enumerate(cycOut):
@@ -182,30 +188,35 @@ for i in range(nrow):
 
         cycOut = open(y_path)
         crpOld = ''
-        yldOld = ''
+        yldOld = 0
         yrOld = ''
         Yld = [] # Annual yield
         Crp = [] # Crops harvested each year
         for rownum, row in enumerate(cycOut):
             if rownum > 1 and float(row[0:4])>= 2013:
                 row = row.split()
+                crp = row[1][0:3]
 
                 # Harvest may be grain or forage
                 if float(row[5]) > 0:
-                    yld = round(float(row[5]),3)
-                else: yld = round(float(row[6]),3)
+                    if crpOld != crp and yrOld != row[0][0:4]:
+                        yld = round(float(row[5]),3)
+                    else: # Cycles may set harvest early, 2 harvests print
+                        yld = round(float(row[5]),3) + float(yldOld)
+                else: # forage
+                    yld = round(float(row[6]),3)
 
-                crp = row[1][0:3]
+
                 # There may be multiple harvests in 1 year
                 # If this is not the first harvest of the year:
-                if yrOld == row[0][0:4]:
+                if yrOld == row[0][0:4] and crp == ('Alf' or 'Rye'):
                     yld = str(yldOld)+'|'+str(yld)
                     crp = crpOld+'|'+crp
 
-                # if the last crop isn't the same as this year, AND it's not the first year:
-                elif yldOld !='':
-                    Yld.append(yldOld)
-                    Crp.append(crpOld)
+                # if the last crop isn't current crop, AND it's not 1st year:
+                elif yldOld != crpOld != '' and yrOld != row[0][0:4]:
+                        Yld.append(yldOld)
+                        Crp.append(crpOld)
 
                 yrOld = row[0][0:4]
                 crpOld= crp
