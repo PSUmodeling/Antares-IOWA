@@ -19,7 +19,7 @@ if len(sys.argv)!=2:
     raise ValueError('Provide scenario identifier')
 scen_interest = sys.argv[1]#.strip("[]")).split(',')
 
-ref_file = 'PSU_CT_00RH_NCC_NF_SF.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
+ref_file = 'PSU_CT_00RH_NCC_NF_ref.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
 data = open(ref_file)
 scen_interest = scen_interest.split('_')
 scen = scen_interest[0]+'_'+scen_interest[3]+'_'+scen_interest[1]+'_'+scen_interest[2]
