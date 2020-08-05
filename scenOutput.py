@@ -162,11 +162,7 @@ for i in range(nrow):
 
     try:
         cycOut = open(n_path)
-        if 'IND' in cycOut:
-            print('#IND error printed')
-            print(ctrl_file)
-            quit()
-            
+
         nums = []
         nitrate = vol = nitrous = 'NA'
         for rownum, row in enumerate(cycOut):
