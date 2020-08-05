@@ -17,7 +17,7 @@
 11. Run others scenarios without spin-up. The other scenarios read in the spun-up soil files (`*_ss`) from the 'CT_NCC_NF_00RH' scenario, running from 2010-2016 (lines 44-45 in `IA_genScen_ald.py`).
 12. Cycles output can be appended to the `PSU_CT_00RH_NCC_NF_ref.csv` file and renamed by running `scenOutput.py`. 
     - Command line example: `python3 ./scenOutput.py CT_NCC_NF_00RH`
-    - This script reads in the `EFC/Antares` reference file, but you will need to tell it which scenario outputs to read in. 
+    - This script reads in the EFC/Antares reference file, but you will need to tell it which scenario outputs to read in. 
     
 ## How to handle common problems/errors
 - If you need to replace/edit a crop file, you will need to redo Step 8 by re-running `IA_genScen_ald.py`
