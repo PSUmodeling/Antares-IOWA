@@ -19,7 +19,7 @@ if len(sys.argv)!=2:
     raise ValueError('Provide scenario identifier')
 scen_interest = sys.argv[1]#.strip("[]")).split(',')
 
-ref_file = 'PSU_CT_00RH_NCC_NF_ref.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
+ref_file = 'PSU_CT_00RH_NCC_NF_test.csv' #'CLU_CT_00RH_NCC_NF_test.csv'
 data = open(ref_file)
 scen_interest = scen_interest.split('_')
 scen = scen_interest[0]+'_'+scen_interest[3]+'_'+scen_interest[1]+'_'+scen_interest[2]
@@ -119,6 +119,9 @@ for i in range(nrow):
     NO3 = [] # nitrate leached
     Vol = [] # volatilized
     N2O = [] # N2O denitrification
+    NO3_avg = 999 # nitrate leached
+    Vol_avg = 999 # volatilized
+    N2O_avg = 999 # N2O denitrification
     crp = [] # yield
 
     if L[i]== "CG|CG|CG|CG":
@@ -163,24 +166,43 @@ for i in range(nrow):
     try:
         cycOut = open(n_path)
 
+        NO3sum = 0
+        N2Osum = 0
+        Volsum = 0
+        y0 = 0
+        yf = 1
         nums = []
         nitrate = vol = nitrous = 'NA'
         for rownum, row in enumerate(cycOut):
-            if rownum > 1 and float(row[0:4])>= 2013:
+            if rownum >= 2 and row[0:4] != '':
+                if rownum == 2:
+                    y0 = float(row[0:4])
+
                 nums_str = row.split()
                 nums = [float(n.strip()) for n in nums_str]
+                NO3sum += nums[4]+nums[6]
+                N2Osum += nums[11]
+                Volsum += nums[10]
+                yf = float(row[0:4])
 
-                nitrate = round(nums[4]+nums[6],3)
-                nitrous = round(nums[11],3)
-                vol = round(nums[10],3)
-                NO3.append(nitrate)
-                N2O.append(nitrous)
-                Vol.append(vol)
-        cycOut.close()
+                if float(row[0:4])>= 2013:
+                    nums_str = row.split()
+                    nums = [float(n.strip()) for n in nums_str]
+
+                    nitrate = round(nums[4]+nums[6],3)
+                    nitrous = round(nums[11],3)
+                    vol = round(nums[10],3)
+                    NO3.append(nitrate)
+                    N2O.append(nitrous)
+                    Vol.append(vol)
+        NO3_avg = round(NO3sum/(yf - y0),3)
+        N2O_avg = round(N2Osum/(yf - y0),3)
+        Vol_avg = round(Volsum/(yf - y0),3)
         if nitrate == 'NA':
-            nOut.append(',NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA')
+            nOut.append(',NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA')
         else:
-            nOut.append(','+str(NO3)[1:-1]+','+str(N2O)[1:-1]+','+str(Vol)[1:-1])
+            nOut.append(','+str(NO3)[1:-1]+','+str(N2O)[1:-1]+\
+            ','+str(Vol)[1:-1]+','+str(NO3_avg)+','+str(N2O_avg)+','+str(Vol_avg))
 
         cycOut = open(y_path)
         crpOld = ''
@@ -265,7 +287,7 @@ for j,row in enumerate(wfile):
     if frstrun:
         frstrun=False
         updated = ",".join(row)+str(',NO3_13, NO3_14, NO3_15, NO3_16, N2O_13, N2O_14, N2O_15, N2O_16, Vol_13, Vol_14, Vol_15, Vol_16 \
-, Crops13, Crops14, Crops15, Crops16, Yield13, Yield14, Yield15, Yield16, soilC_delta \n')
+,NO3_avg, N2O_avg, Vol_avg, Crops13, Crops14, Crops15, Crops16, Yield13, Yield14, Yield15, Yield16, soilC_delta \n')
     else:
         updated = ",".join(row)+nOut[i]+yOut[i]+str(delta_C[i])+str('\n')
 
