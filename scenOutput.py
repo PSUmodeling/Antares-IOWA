@@ -100,7 +100,7 @@ for row in data:
             L.append(row[lc])
             S.append(row[sc])
             C.append(row[cc])
-            A.append(float(row[ac]))
+            A.append(round(float(row[ac]),3))
             M.append(float(row[mc]))
             B.append(row[anc])
             # ON.append(float(row[onc]))
@@ -157,7 +157,7 @@ for i in range(nrow):
             P.append('1')
         else: P.append('2')
 
-    ctrl_file = 'W'+WC[i]+'_'+crop[i]+P[i]+'_'+S[i]+'_'+scen_interest
+    ctrl_file = 'W'+WC[i]+'_'+crop[i]+P[i]+'_'+S[i]+'_NH'+str(A[i])+'_'+scen_interest
 
     n_path = 'output/'+ctrl_file+'/annualN.dat'
     y_path = 'output/'+ctrl_file+'/season.dat'
@@ -198,6 +198,10 @@ for i in range(nrow):
         NO3_avg = round(NO3sum/(yf - y0),3)
         N2O_avg = round(N2Osum/(yf - y0),3)
         Vol_avg = round(Volsum/(yf - y0),3)
+        # if isnan(NO3_avg) or isnan(N2O_avg) or isnan(Vol_avg):
+        #     print(ctrl_file)
+        #     print('NAN outputs. NO3 Outputs:')
+        #     print(NO3)
         if nitrate == 'NA':
             nOut.append(',NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA')
         else:
@@ -217,9 +221,10 @@ for i in range(nrow):
 
                 # Harvest may be grain or forage
                 if float(row[5]) > 0:
-                    if crpOld != crp and yrOld != row[0][0:4]:
+                    if yrOld != row[0][0:4]:
                         yld = round(float(row[5]),3)
-                    else: # Cycles may set harvest early, 2 harvests print
+                    elif crpOld == crp: # AND yrOld == yr
+                    # Cycles may set harvest early, 2 harvests print
                         yld = round(float(row[5]),3) + float(yldOld)
                 else: # forage
                     yld = round(float(row[6]),3)

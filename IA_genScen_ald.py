@@ -7,7 +7,7 @@ import sys
 #########################################################################################
 
 
-data = open("PSU_CT_00RH_NCC_NF_ref.csv") #SF_ALD_metadata_PSU.csv
+data = open("PSU_CT_00RH_NCC_NF_ref.csv") #'PSU_CT_00RH_NCC_NF_ref.csv'
  #IA_EFC_PSU_CGSB_20200622.csv
 
 if len(sys.argv)!=2:
@@ -40,10 +40,10 @@ lenRot = [1,2,3]                            # length of rotation label
 # CRP scenarios
 
 # Swithgrass scenarios
-MMfile = open('input\IA_SG_scenarios.txt', 'w' )
-MMfile.write('SIM_CODE \t\t\t\t\t\t ROTATION_YEARS START_YEAR END_YEAR USE_REINIT CROP_FILE \t OPERATION_FILE \t\t\t SOIL_FILE \
-    \t WEATHER_FILE \t REINIT_FILE HOURLY_INFILTRATION AUTOMATIC_NITROGEN \n')
-MMfile.close()
+# MMfile = open('input\IA_SG_scenarios.txt', 'w' )
+# MMfile.write('SIM_CODE \t\t\t\t\t\t ROTATION_YEARS START_YEAR END_YEAR USE_REINIT CROP_FILE \t OPERATION_FILE \t\t\t SOIL_FILE \
+#     \t WEATHER_FILE \t REINIT_FILE HOURLY_INFILTRATION AUTOMATIC_NITROGEN \n')
+# MMfile.close()
 
 # Conventional crops scenarios
 for j in range(len(scen_interest)):
@@ -178,20 +178,20 @@ for i in range(nrow):
     else: A[i] = round(A[i],3)
 
 
-    ctrl_SG = 'W'+WC[i]+'_'+crop[i]+'_'+S[i]+'_SG'
+    # ctrl_SG = 'W'+WC[i]+'_'+crop[i]+'_'+S[i]+'_SG'
     soil_file = 'soils/'+S[i]+'.soil'
     wthr_file = 'weather/'+W[i]
 
-    oper_fileSG = 'operations/ALD_SG1_NH'+str(A[i])+'_CT_00RH.operation'
-    MMfileSG = open( 'input/IA_SG_scenarios.txt', 'a' )
-    MMfileSG.write('%s \t %i \t\t\t %i \t\t %i \t %i \t %s \t %s \t %s \t %s \t %s \t %i \t %i \n' %
-    (C[i]+'SG', 1, 2010, 2016, reinit, crop_file, oper_fileSG, ctrl_SG[0:-2]+'CT_NCC_NF_00RH_ss.soil', wthr_file, reinit_file, hour_inf, auto_nit))
-    MMfileSG.close()
+    # oper_fileSG = 'operations/ALD_SG1_NH'+str(A[i])+'_CT_00RH.operation'
+    # MMfileSG = open( 'input/IA_SG_scenarios.txt', 'a' )
+    # MMfileSG.write('%s \t %i \t\t\t %i \t\t %i \t %i \t %s \t %s \t %s \t %s \t %s \t %i \t %i \n' %
+    # (C[i]+'SG', 1, 2010, 2016, reinit, crop_file, oper_fileSG, ctrl_SG[0:-2]+'CT_NCC_NF_00RH_ss.soil', wthr_file, reinit_file, hour_inf, auto_nit))
+    # MMfileSG.close()
 
     for k in range(len(scen_interest)):
          #unique simulation ID
-            ctrl_file = 'W'+WC[i]+'_'+crop[i]+str(P[i])+'_'+S[i]+'_'+scen_interest[k]
-            soil_file_alt = 'W'+WC[i]+'_'+crop[i]+str(P[i])+'_'+S[i]+'_CT_NCC_NF_00RH_ss.soil'
+            ctrl_file = 'W'+WC[i]+'_'+crop[i]+str(P[i])+'_'+S[i]+'_NH'+str(A[i])+'_'+scen_interest[k]
+            soil_file_alt = 'W'+WC[i]+'_'+crop[i]+str(P[i])+'_'+S[i]+'_NH'+str(A[i])+'_CT_NCC_NF_00RH_ss.soil'
             if ctrl_file not in sim_seen:
                 pass
             else: continue # skip repeat simulations
@@ -240,6 +240,7 @@ for k in range(len(scen_interest)):
                     lines_seen.add(op_line)
         scenfile.close()
         outfile2.close()
+
 #########################################################################################
 ### Create operation files
 #########################################################################################
@@ -413,6 +414,7 @@ for j in range(len(scen_interest)):
             if rotStr == r_type[i]:
                 try:
                     amends = round(float(line[2][2:]),3)
+
                 except ValueError:
                     amends = amndsA[3]
                     print(line[2][2:])
