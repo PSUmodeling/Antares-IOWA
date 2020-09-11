@@ -67,7 +67,9 @@ EOF
             ./Cycles -s -b ${SIM_CODE}
         else
             # Unzip soil file from archive
-            unzip -j ss_soil.zip input/${SOIL_FILE} -d ./input
+            SOIL_ARCHIVE=${1%%.*}
+            SOIL_ARCHIVE="${SOIL_ARCHIVE/NT/CT}_soil.zip"
+            unzip -oj ${SOIL_ARCHIVE} input/${SOIL_FILE} -d ./input
             ./Cycles -b ${SIM_CODE}
         fi
 
@@ -83,8 +85,13 @@ EOF
         rm -r output/${SIM_CODE} &> /dev/null
 
         # Add steady-state soil file to archive and then delete
-        zip -u ss_soil.zip input/${SIM_CODE}_ss.soil
-        rm input/${SIM_CODE}_ss.soil
+        if [ $SPIN_UP == 1 ]; then
+            SOIL_ARCHIVE=
+            zip -u ${1%.txt}_soil.zip input/${SIM_CODE}_ss.soil &> /dev/null
+            rm input/${SIM_CODE}_ss.soil &> /dev/null
+        else
+            rm input/${SOIL_FILE}
+        fi
 
     done
 }<"$MULTI_FILE"
