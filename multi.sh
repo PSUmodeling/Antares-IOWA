@@ -17,6 +17,11 @@ SPIN_UP=$2
     do
         # Read control parameters from one line
         SIM_CODE=$(echo ${line} | awk '{print $1}')
+
+        if [[ "$(echo $SIM_CODE | head -c 1)" == "#" ]]; then
+            continue
+        fi
+
         ROT_YEARS=$(echo ${line} | awk '{print $2}')
         START_YEAR=$(echo ${line} | awk '{print $3}')
         END_YEAR=$(echo ${line} | awk '{print $4}')
