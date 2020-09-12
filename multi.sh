@@ -73,6 +73,12 @@ EOF
             ./Cycles -b ${SIM_CODE}
         fi
 
+        if [ "$?" == 0 ]; then
+            SUCCESS=1
+        else
+            SUCCESS=0
+        fi
+
         # Delete generated control file
         rm input/${SIM_CODE}.ctrl
 
@@ -81,7 +87,11 @@ EOF
         ZIP=${ZIP%%.*}
 
         # Add output to archive and then delete
-        zip -ur ${ZIP}.zip output/${SIM_CODE} &> /dev/null
+        if [ $SUCCESS == 1 ]; then
+            zip -ur ${ZIP}.zip output/${SIM_CODE} &> /dev/null
+        else
+            echo "Simulation ${SIM_CODE} failed"
+        fi
         rm -r output/${SIM_CODE} &> /dev/null
 
         # Add steady-state soil file to archive and then delete
